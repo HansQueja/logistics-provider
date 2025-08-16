@@ -1,4 +1,4 @@
-# Thumbworx's Logistics Provider's View
+# 🏎️ Thumbworx's Logistics Provider's View
 
 The logistics provider’s view provides summarized and important data for the logistics partners, such as partnered drivers, shifts, vehicle usage per day, and heatmaps towards common delivery locations. This feature includes all the said data in one place for ease of access and convenience.
 
