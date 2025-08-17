@@ -6,9 +6,6 @@ use App\Models\LogisticProvider;
 use App\Models\Driver;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
- */
 class LogisticProviderFactory extends Factory
 {
     
