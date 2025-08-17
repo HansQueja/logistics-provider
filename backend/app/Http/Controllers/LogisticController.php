@@ -11,7 +11,9 @@ class LogisticController extends Controller
 {
     public function assigned_drivers($id)
     {
-        $drivers = Driver::where('provider_id', $id)->count();
-        return response()->json($drivers);
+        $drivers_count = Driver::where('provider_id', $id)->count();
+        return response()->json([
+            'Assigned Drivers Count' => $drivers_count
+        ]);
     }
 }
