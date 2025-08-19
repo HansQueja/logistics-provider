@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VehicleUsageController;
-use App\Http\Controllers\LogisticController; // <-- Point to your controller
+use App\Http\Controllers\LogisticController;
+use App\Http\Controllers\DeliveryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,3 +16,6 @@ Route::get('/logistic-providers/{provider}/vehicle-usage', [VehicleUsageControll
 
 // Route for "Get Assigned Drivers Count" feature
 Route::get('/logistic-providers/{provider}/assigned-drivers-count', [LogisticController::class, 'assigned_drivers']);
+
+// Route for creating delivery records
+Route::post('/logistics/{id}/delivery', [DeliveryController::class, 'create_delivery']);
