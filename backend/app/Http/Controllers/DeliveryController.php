@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Location;
 use App\Models\Delivery;
+use App\Models\LogisticProvider;
 use App\Jobs\PredictCoordinates;
 
 class DeliveryController extends Controller
 {
-    public function create_delivery(Request $request, string $id) 
+    public function createDelivery(Request $request, LogisticProvider $provider) 
     {
         $validated = $request->validate([
             'driver_id' => 'required|numeric',
@@ -19,7 +20,7 @@ class DeliveryController extends Controller
         ]);
 
         $delivery = Delivery::create([
-            'provider_id' => $id,
+            'provider_id' => $provider->id,
             'driver_id' => $validated['driver_id'],
             'address' => $validated['address'],
             'status' => $validated['status']
@@ -39,5 +40,19 @@ class DeliveryController extends Controller
             'message' => 'Delivery instance created',
             'delivery_id' => $delivery->id
         ]);
+    }
+
+    public function getLocations(LogisticProvider $provider) 
+    {
+        $locations = Location::whereIn(
+            'id',
+            Delivery::where('provider_id', $provider->id)->pluck('location_id')->unique()
+        )->get();
+
+        if ($locations->isEmpty()) {
+            return response()->json(['message' => 'No records under your provider id.']);
+        }
+
+        return response()->json($locations);
     }
 }
