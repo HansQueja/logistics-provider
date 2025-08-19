@@ -18,12 +18,12 @@ return new class extends Migration
                   ->constrained('logistic_providers')
                   ->onDelete('cascade');
             $table->foreignId('driver_id')
-                  ->nullble()
-                  ->constrainted('drivers')
+                  ->nullable()
+                  ->constrained('drivers')
                   ->onDelete('cascade');
             $table->foreignId('location_id')
-                  ->nullble()
-                  ->constrainted('locations')
+                  ->nullable()
+                  ->constrained('locations')
                   ->onDelete('cascade');
             $table->string('address');
             $table->enum('status', ['DELIVERED', 'IN-PROGRESS', 'FAILED']);
