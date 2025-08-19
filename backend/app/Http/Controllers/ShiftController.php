@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Driver;
 use App\Models\QrScanLog;
+use App\Models\LogisticProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -11,31 +12,31 @@ use Carbon\Carbon;
 class ShiftController extends Controller
 {
     /**
-     * Get driver shift durations for a provider
+     * Get driver shift durations for a provider (using consistent provider pattern)
      */
-    public function getShiftDurations(Request $request)
+    public function getShiftDurations(Request $request, LogisticProvider $provider)
     {
-        // Add CORS headers
+        // Add CORS headers for frontend compatibility
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type, Authorization');
-        
+
         if ($request->getMethod() === 'OPTIONS') {
             return response('', 200);
         }
-        
+
         $request->validate([
-            'provider_id' => 'required|integer|exists:logistic_providers,id',
             'driver_id' => 'nullable|integer|exists:drivers,id',
             'range_type' => 'nullable|in:daily,weekly,monthly',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
         ]);
 
-        $providerId = $request->provider_id;
+        // Use the provider from route parameter (consistent pattern)
+        $providerId = $provider->id;
         $driverId = $request->driver_id;
         $rangeType = $request->range_type ?? 'daily';
-        
+
         // Default to current date if no dates provided
         $startDate = $request->start_date ?? now()->toDateString();
         $endDate = $request->end_date ?? now()->toDateString();
@@ -52,31 +53,36 @@ class ShiftController extends Controller
             $end = Carbon::parse($endDate);
         }
 
+        // Updated query for PostgreSQL compatibility (since we're using Supabase)
         $query = DB::table('drivers as d')
             ->leftJoin('qr_scan_logs as qsl', 'd.id', '=', 'qsl.driver_id')
             ->select([
                 'd.id as driver_id',
                 'd.name',
-                DB::raw('DATE(qsl.scanned_at) as shift_date'),
-                DB::raw('MIN(CASE WHEN qsl.scan_type = "IN" THEN qsl.scanned_at END) as first_scan_in'),
-                DB::raw('MAX(CASE WHEN qsl.scan_type = "OUT" THEN qsl.scanned_at END) as last_scan_out'),
+                DB::raw('DATE(qsl.created_at) as shift_date'),
+                DB::raw('MIN(CASE WHEN qsl.scan_type = \'IN\' THEN qsl.created_at END) as first_scan_in'),
+                DB::raw('MAX(CASE WHEN qsl.scan_type = \'OUT\' THEN qsl.created_at END) as last_scan_out'),
+                // PostgreSQL-compatible duration calculation
                 DB::raw('
-                    CASE 
-                        WHEN MAX(CASE WHEN qsl.scan_type = "OUT" THEN qsl.scanned_at END) IS NOT NULL
+                    CASE
+                        WHEN MAX(CASE WHEN qsl.scan_type = \'OUT\' THEN qsl.created_at END) IS NOT NULL
                         THEN ROUND(
-                            (strftime("%s", MAX(CASE WHEN qsl.scan_type = "OUT" THEN qsl.scanned_at END)) - 
-                             strftime("%s", MIN(CASE WHEN qsl.scan_type = "IN" THEN qsl.scanned_at END))) / 3600.0, 2
+                            EXTRACT(EPOCH FROM (
+                                MAX(CASE WHEN qsl.scan_type = \'OUT\' THEN qsl.created_at END) -
+                                MIN(CASE WHEN qsl.scan_type = \'IN\' THEN qsl.created_at END)
+                            )) / 3600.0, 2
                         )
                         ELSE ROUND(
-                            (strftime("%s", datetime("now")) - 
-                             strftime("%s", MIN(CASE WHEN qsl.scan_type = "IN" THEN qsl.scanned_at END))) / 3600.0, 2
+                            EXTRACT(EPOCH FROM (
+                                NOW() - MIN(CASE WHEN qsl.scan_type = \'IN\' THEN qsl.created_at END)
+                            )) / 3600.0, 2
                         )
                     END as shift_duration_hours
                 ')
             ])
             ->where('d.provider_id', $providerId)
-            ->whereBetween(DB::raw('DATE(qsl.scanned_at)'), [$start->toDateString(), $end->toDateString()])
-            ->groupBy('d.id', 'd.name', DB::raw('DATE(qsl.scanned_at)'))
+            ->whereBetween(DB::raw('DATE(qsl.created_at)'), [$start->toDateString(), $end->toDateString()])
+            ->groupBy('d.id', 'd.name', DB::raw('DATE(qsl.created_at)'))
             ->orderBy('d.id')
             ->orderBy('shift_date');
 
@@ -93,6 +99,8 @@ class ShiftController extends Controller
                     'range_type' => 'daily',
                     'start_date' => $start->toDateString(),
                     'end_date' => $end->toDateString(),
+                    'provider_id' => $providerId,
+                    'provider_name' => $provider->name,
                     'shifts' => $shifts
                 ]
             ]);
@@ -122,6 +130,8 @@ class ShiftController extends Controller
                 'range_type' => $rangeType,
                 'start_date' => $start->toDateString(),
                 'end_date' => $end->toDateString(),
+                'provider_id' => $providerId,
+                'provider_name' => $provider->name,
                 'aggregated_data' => $aggregated->values()
             ]
         ])->header('Access-Control-Allow-Origin', '*')
@@ -130,25 +140,51 @@ class ShiftController extends Controller
     }
 
     /**
-     * Record a QR scan (check in or check out)
+     * Record a QR scan (check in or check out) - Updated for consistent pattern
      */
-    public function recordScan(Request $request)
+    public function recordScan(Request $request, LogisticProvider $provider)
     {
+        // Add CORS headers
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+        if ($request->getMethod() === 'OPTIONS') {
+            return response('', 200);
+        }
+
         $request->validate([
             'driver_id' => 'required|integer|exists:drivers,id',
             'scan_type' => 'required|in:IN,OUT',
         ]);
 
+        // Verify the driver belongs to this provider
+        $driver = Driver::where('id', $request->driver_id)
+                       ->where('provider_id', $provider->id)
+                       ->first();
+
+        if (!$driver) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Driver not found for this provider'
+            ], 404);
+        }
+
         $scan = QrScanLog::create([
             'driver_id' => $request->driver_id,
             'scan_type' => $request->scan_type,
-            'scanned_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Scan recorded successfully',
-            'data' => $scan
-        ]);
+            'data' => $scan,
+            'provider_id' => $provider->id,
+            'driver_name' => $driver->name
+        ])->header('Access-Control-Allow-Origin', '*')
+          ->header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+          ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     }
 }
