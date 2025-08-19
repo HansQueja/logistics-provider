@@ -19,4 +19,9 @@ class Location extends Model
 
     public const STATUS_ACTIVE   = 'ACTIVE';
     public const STATUS_INACTIVE  = 'INACTIVE';
+
+    public function deliveries()
+    {
+        return $this->hasMany(Delivery::class, 'location_id');
+    }
 }
