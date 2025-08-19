@@ -42,7 +42,7 @@ class DeliveryController extends Controller
         ]);
     }
 
-    public function getLocations(LogisticProvider $provider) 
+    public function getProviderLocations(LogisticProvider $provider) 
     {
         $locations = Location::whereIn(
             'id',
@@ -52,6 +52,13 @@ class DeliveryController extends Controller
         if ($locations->isEmpty()) {
             return response()->json(['message' => 'No records under your provider id.']);
         }
+
+        return response()->json($locations);
+    }
+
+    public function getAllLocations() 
+    {
+        $locations = Location::all();
 
         return response()->json($locations);
     }
