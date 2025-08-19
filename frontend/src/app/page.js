@@ -1,103 +1,281 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [shiftData, setShiftData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState({
+    providerId: 1, // Default to first provider
+    rangeType: 'daily',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0]
+  });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const fetchShiftData = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        provider_id: filters.providerId,
+        range_type: filters.rangeType,
+        start_date: filters.startDate,
+        end_date: filters.endDate
+      });
+
+      const response = await fetch(`http://localhost:8000/api/shifts?${params}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setShiftData(data.data);
+      } else {
+        console.error('API returned error:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching shift data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchShiftData();
+  }, []);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header with Gradient */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-t-lg p-8 mb-0">
+          <h1 className="text-4xl font-bold mb-2">
+            🏎️ Logistics Provider Dashboard
+          </h1>
+          <p className="text-blue-100 text-lg">Driver Shift Tracking & Management</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Filters Section with Light Background */}
+        <div className="bg-white p-6 shadow-lg border-l border-r border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">📊 Filters & Controls</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Provider ID with Light Styling */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">
+                🏢 Provider ID
+              </label>
+              <select
+                name="providerId"
+                value={filters.providerId}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-4 bg-white text-black border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:bg-gray-50 font-bold text-lg shadow-lg hover:shadow-xl transition duration-200"
+              >
+                <option value={1} className="bg-white text-black font-semibold">1 - Swift Logistics</option>
+                <option value={2} className="bg-white text-black font-semibold">2 - Express Delivery Co</option>
+                <option value={3} className="bg-white text-black font-semibold">3 - Metro Transport Ltd</option>
+                <option value={4} className="bg-white text-black font-semibold">4 - Global Freight Services</option>
+              </select>
+            </div>
+
+            {/* Range Type with Light Styling */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">
+                📅 Range Type
+              </label>
+              <select
+                name="rangeType"
+                value={filters.rangeType}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-4 bg-white text-black border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:bg-gray-50 font-bold text-lg shadow-lg hover:shadow-xl transition duration-200"
+              >
+                <option value="daily" className="bg-white text-black font-semibold">📊 Daily View</option>
+                <option value="weekly" className="bg-white text-black font-semibold">📈 Weekly Summary</option>
+                <option value="monthly" className="bg-white text-black font-semibold">📉 Monthly Summary</option>
+              </select>
+            </div>
+
+            {/* Start Date with Light Styling */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">
+                🗓️ Start Date
+              </label>
+              <input
+                type="date"
+                name="startDate"
+                value={filters.startDate}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-4 bg-white text-black border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:bg-gray-50 font-bold text-lg shadow-lg hover:shadow-xl transition duration-200"
+              />
+            </div>
+
+            {/* End Date with Light Styling */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">
+                📅 End Date
+              </label>
+              <input
+                type="date"
+                name="endDate"
+                value={filters.endDate}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-4 bg-white text-black border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:bg-gray-50 font-bold text-lg shadow-lg hover:shadow-xl transition duration-200"
+              />
+            </div>
+          </div>
+
+          {/* Apply Button with Enhanced Styling */}
+          <div className="mt-8">
+            <button
+              onClick={fetchShiftData}
+              disabled={loading}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-10 rounded-lg transition duration-200 shadow-xl hover:shadow-2xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none text-lg"
+            >
+              {loading ? (
+                <>
+                  <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                  Loading...
+                </>
+              ) : (
+                <>🔄 Apply Filters</>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Results Section */}
+        <div className="bg-white rounded-b-lg shadow-lg p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-800">
+              📋 Shift Data Results
+            </h2>
+            {shiftData && (
+              <div className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-lg border">
+                <strong>Period:</strong> {shiftData.start_date} to {shiftData.end_date} | 
+                <strong className="ml-2">View:</strong> {shiftData.range_type}
+              </div>
+            )}
+          </div>
+
+          {loading && (
+            <div className="text-center py-16">
+              <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+              <p className="mt-4 text-gray-600 text-xl font-semibold">Loading shift data...</p>
+            </div>
+          )}
+
+          {!loading && !shiftData && (
+            <div className="text-center py-16">
+              <div className="text-gray-500 text-xl">No data available.</div>
+              <div className="text-gray-400 mt-2">Try adjusting your filters.</div>
+            </div>
+          )}
+
+          {!loading && shiftData && (
+            <div>
+              {filters.rangeType === 'daily' && shiftData.shifts && shiftData.shifts.length > 0 && (
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                  <table className="min-w-full bg-white">
+                    <thead className="bg-gray-800 text-white">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">👤 Driver</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">📅 Date</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">🕐 First IN</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">🕕 Last OUT</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">⏰ Duration</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {shiftData.shifts.map((shift, index) => (
+                        <tr key={index} className="hover:bg-gray-50 transition duration-150">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                            {shift.name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {shift.shift_date}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {shift.first_scan_in ? new Date(shift.first_scan_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {shift.last_scan_out ? new Date(shift.last_scan_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '🔴 Ongoing'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <span className={`inline-flex px-3 py-1 text-sm font-bold rounded-full ${
+                              shift.shift_duration_hours >= 8 
+                                ? 'bg-green-200 text-green-800' 
+                                : shift.shift_duration_hours >= 4
+                                ? 'bg-yellow-200 text-yellow-800'
+                                : 'bg-red-200 text-red-800'
+                            }`}>
+                              {shift.shift_duration_hours > 0 ? `${shift.shift_duration_hours}h` : 'Invalid'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {(filters.rangeType === 'weekly' || filters.rangeType === 'monthly') && shiftData.aggregated_data && shiftData.aggregated_data.length > 0 && (
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                  <table className="min-w-full bg-white">
+                    <thead className="bg-gray-800 text-white">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">👤 Driver</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">📅 Period Start</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">📊 Days Worked</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">⏰ Total Hours</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">📈 Avg Shift</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {shiftData.aggregated_data.map((driver) => (
+                        <tr key={driver.driver_id} className="hover:bg-gray-50 transition duration-150">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                            {driver.driver_name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {driver.period_start}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            <span className="inline-flex px-2 py-1 text-xs font-bold rounded-full bg-blue-200 text-blue-800">
+                              {driver.days_worked} days
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            <span className="inline-flex px-2 py-1 text-xs font-bold rounded-full bg-purple-200 text-purple-800">
+                              {driver.total_hours}h
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            <span className="inline-flex px-2 py-1 text-xs font-bold rounded-full bg-green-200 text-green-800">
+                              {driver.avg_shift_hours}h
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {(!shiftData.shifts || shiftData.shifts.length === 0) && 
+               (!shiftData.aggregated_data || shiftData.aggregated_data.length === 0) && (
+                <div className="text-center py-16">
+                  <div className="text-gray-500 text-xl">No shift data found for the selected criteria.</div>
+                  <div className="text-gray-400 mt-2">Try selecting a different provider or date range.</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
