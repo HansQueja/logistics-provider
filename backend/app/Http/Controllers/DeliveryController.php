@@ -32,8 +32,7 @@ class DeliveryController extends Controller
         if (is_null($delivery_location)) {
             PredictCoordinates::dispatch($delivery->id);
         } else {
-            $delivery->location_id = $delivery_location->id;
-            $delivery->save();
+            $delivery->update(['location_id' => $delivery_location->id]);
         }
 
         return response()->json([
