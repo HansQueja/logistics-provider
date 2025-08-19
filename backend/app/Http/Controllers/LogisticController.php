@@ -10,7 +10,7 @@ use App\Models\Driver;
 class LogisticController extends Controller
 {
     // The method name can stay the same, but the logic is now more robust.
-    public function assigned_drivers(LogisticProvider $provider) // <-- Change $id to LogisticProvider $provider
+    public function assignedDrivers(LogisticProvider $provider) // <-- Change $id to LogisticProvider $provider
     {
         // Use the injected $provider model and add the 'status' filter
         $drivers_count = Driver::where('provider_id', $provider->id)

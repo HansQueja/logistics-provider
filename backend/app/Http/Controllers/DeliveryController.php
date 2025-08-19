@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Location;
+use App\Models\Delivery;
+use App\Models\LogisticProvider;
+use App\Jobs\PredictCoordinates;
+
+class DeliveryController extends Controller
+{
+    public function createDelivery(Request $request, LogisticProvider $provider) 
+    {
+        $validated = $request->validate([
+            'driver_id' => 'required|numeric',
+            'address' => 'required|string',
+            'status' => 'required|string'
+        ]);
+
+        $delivery = Delivery::create([
+            'provider_id' => $provider->id,
+            'driver_id' => $validated['driver_id'],
+            'address' => $validated['address'],
+            'status' => $validated['status']
+        ]);
+
+        $address = $validated['address'];
+
+        $delivery_location = Location::where('address', $address)->first();
+
+        if (is_null($delivery_location)) {
+            PredictCoordinates::dispatch($delivery->id);
+        } else {
+            $delivery->update(['location_id' => $delivery_location->id]);
+        }
+
+        return response()->json([
+            'message' => 'Delivery instance created',
+            'delivery_id' => $delivery->id
+        ]);
+    }
+
+    public function getProviderLocations(LogisticProvider $provider) 
+    {
+        $locations = Location::whereIn(
+            'id',
+            Delivery::where('provider_id', $provider->id)->pluck('location_id')->unique()
+        )->get();
+
+        if ($locations->isEmpty()) {
+            return response()->json(['message' => 'No records under your provider id.']);
+        }
+
+        return response()->json($locations);
+    }
+
+    public function getAllLocations() 
+    {
+        $locations = Location::all();
+
+        return response()->json($locations);
+    }
+}
