@@ -2,21 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Driver extends Model
+class Vehicle extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
-        'provider_id',
-        'status',
+        'type',
+        'plate_number',
+        'logistic_provider_id',
     ];
 
     public function logisticProvider()
     {
-        return $this->belongsTo(LogisticProvider::class, 'provider_id');
+        return $this->belongsTo(LogisticProvider::class);
     }
 }
