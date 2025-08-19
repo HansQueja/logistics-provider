@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 use App\Models\Delivery;
+use App\Models\Location;
 
 class PredictCoordinates implements ShouldQueue
 {
@@ -29,14 +30,23 @@ class PredictCoordinates implements ShouldQueue
         $delivery = Delivery::find($this->deliveryId);
         if (!$delivery) return;
 
-        $address = $delivery->address;
+        $data = [
+            'address' => $delivery->address,
+            'status' => $delivery->status,
+        ];
 
-        $api_result = Http::post("http://localhost:5000/api/find_coordinates", [
-            'address' => $address]
-        );
+        $api_result = Http::post("http://localhost:5000/find_coordinates", $data);
 
         $locationData = $api_result->json();
-        $delivery->location_id = $locationData['location_id'] ?? null;
-        $delivery->save();
+
+        $location = Location::create([
+            'address' => $locationData['address'],
+            'latitude' => $locationData['latitude'],
+            'longitude' => $locationData['longitude'],
+            'type' => $locationData['type'],
+            'status' => $locationData['status'],
+        ]);
+
+        $delivery->update(['location_id' => $location->id]);
     }
 }
