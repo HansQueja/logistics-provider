@@ -20,6 +20,8 @@ Route::get('/logistic-providers/{provider}/assigned-drivers-count', [LogisticCon
 // Route for creating delivery records
 Route::post('/logistic-providers/{provider}/delivery', [DeliveryController::class, 'createDelivery']);
 
-// Route for "Get Assigned Drivers Count" feature
-Route::get('/logistic-providers/{provider}/locations', [DeliveryController::class, 'getLocations']);
+// Route for getting all locations associated with provider
+Route::get('/logistic-providers/{provider}/locations', [DeliveryController::class, 'getProviderLocations']);
 
+// Route for getting all locations in the database
+Route::get('/logistic-providers/locations', [DeliveryController::class, 'getAllLocations']);
