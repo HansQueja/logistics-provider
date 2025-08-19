@@ -1,10 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LogisticController;
-use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\VehicleUsageController;
+use App\Http\Controllers\LogisticController; // <-- Point to your controller
 
-Route::get('/logistics/{id}/assigned_drivers', [LogisticController::class, 'assigned_drivers']);
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+*/
 
-# Heatmap
-Route::post('/logistics/{id}/delivery', [DeliveryController::class, 'create_delivery']);
+// Route for "Vehicle Usage Per Day" feature
+Route::get('/logistic-providers/{provider}/vehicle-usage', [VehicleUsageController::class, 'dailySummary']);
+
+// Route for "Get Assigned Drivers Count" feature
+Route::get('/logistic-providers/{provider}/assigned-drivers-count', [LogisticController::class, 'assigned_drivers']);

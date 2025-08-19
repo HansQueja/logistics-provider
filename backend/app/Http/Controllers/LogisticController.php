@@ -9,11 +9,17 @@ use App\Models\Driver;
 
 class LogisticController extends Controller
 {
-    public function assigned_drivers($id)
+    // The method name can stay the same, but the logic is now more robust.
+    public function assigned_drivers(LogisticProvider $provider) // <-- Change $id to LogisticProvider $provider
     {
-        $drivers_count = Driver::where('provider_id', $id)->count();
+        // Use the injected $provider model and add the 'status' filter
+        $drivers_count = Driver::where('provider_id', $provider->id)
+                               ->where('status', 'LINKED')
+                               ->count();
+
         return response()->json([
-            'Assigned Drivers Count' => $drivers_count
+            // Using snake_case is more conventional for JSON keys
+            'assigned_drivers_count' => $drivers_count
         ]);
     }
 }
