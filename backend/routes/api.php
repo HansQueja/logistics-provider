@@ -25,3 +25,6 @@ Route::get('/logistic-providers/{provider}/locations', [DeliveryController::clas
 
 // Route for getting all locations in the database
 Route::get('/logistic-providers/locations', [DeliveryController::class, 'getAllLocations']);
+
+// Route for "Daily Scan-ins & Scan-outs" trend
+Route::get('/logistic-providers/{provider}/activity-trend', [VehicleUsageController::class, 'activityTrend']);
