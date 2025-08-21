@@ -15,8 +15,11 @@ class LogisticController extends Controller
         $drivers_list = Driver::where('provider_id', $provider->id)
                                ->where('status', 'LINKED')->get();
 
+        $logistic_provider = LogisticProvider::find($provider->id);
+
         return response()->json([
             // Using snake_case is more conventional for JSON keys
+            'company_name' => $logistic_provider->company_name,
             'assigned_drivers_count' => $drivers_list->count(),
             'drivers_list' => $drivers_list
         ]);
