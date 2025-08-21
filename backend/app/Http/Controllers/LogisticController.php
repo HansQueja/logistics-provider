@@ -13,7 +13,7 @@ class LogisticController extends Controller
     public function assignedDrivers(LogisticProvider $provider) // <-- Change $id to LogisticProvider $provider
     {
         $drivers_list = Driver::where('provider_id', $provider->id)
-                               ->where('status', 'LINKED');
+                               ->where('status', 'LINKED')->get();
 
         return response()->json([
             // Using snake_case is more conventional for JSON keys
