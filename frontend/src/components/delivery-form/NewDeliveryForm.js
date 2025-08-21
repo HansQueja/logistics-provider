@@ -9,7 +9,7 @@ const fetcher = (url) => fetch(url).then((res) => res.json());
 const NewDeliveryForm = ({ providerId }) => {
     // --- State for the form inputs ---
     const [address, setAddress] = useState('');
-    const [status, setStatus] = useState('IN--PROGRESS');
+    const [status, setStatus] = useState('IN-PROGRESS');
     const [driverId, setDriverId] = useState(''); // State for the selected driver
 
     // --- State for handling submission feedback ---
