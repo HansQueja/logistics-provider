@@ -16,7 +16,8 @@ const Header = () => {
 
                     {/* Navigation */}
                     <nav>
-                        <ul className="flex space-x-8 text-gray-300 font-medium">
+                        {/* Use items-center to vertically align the new button with the text links */}
+                        <ul className="flex items-center space-x-8 text-gray-300 font-medium">
                             <li>
                                 <Link
                                     href="/providers/1/drivers-count"
@@ -41,13 +42,22 @@ const Header = () => {
                                     Vehicle Usage
                                 </Link>
                             </li>
-                            {/* --- NEW NAVIGATION LINK --- */}
                             <li>
                                 <Link
-                                    href="/providers/1/delivery-heatmap" // Points to the new page
+                                    href="/providers/1/delivery-heatmap"
                                     className="hover:text-white transition-colors duration-200"
                                 >
                                     Delivery Heatmap
+                                </Link>
+                            </li>
+                            
+                            {/* --- NEW LINK TO THE DELIVERY FORM --- */}
+                            <li>
+                                <Link
+                                    href="/deliveries/new" // This is the correct URL for your form page
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300"
+                                >
+                                    + New Delivery
                                 </Link>
                             </li>
                         </ul>
