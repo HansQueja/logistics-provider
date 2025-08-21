@@ -14,14 +14,10 @@ class LogisticController extends Controller
     {
         $drivers_list = Driver::where('provider_id', $provider->id)
                                ->where('status', 'LINKED');
-        // Use the injected $provider model and add the 'status' filter
-        $drivers_count = Driver::where('provider_id', $provider->id)
-                               ->where('status', 'LINKED')
-                               ->count();
 
         return response()->json([
             // Using snake_case is more conventional for JSON keys
-            'assigned_drivers_count' => $drivers_count,
+            'assigned_drivers_count' => $drivers_list->count(),
             'drivers_list' => $drivers_list
         ]);
     }
