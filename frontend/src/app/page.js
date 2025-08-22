@@ -16,13 +16,12 @@ export default function Home() {
     setLoading(true);
     try {
       const params = new URLSearchParams({
-        provider_id: filters.providerId,
         range_type: filters.rangeType,
         start_date: filters.startDate,
         end_date: filters.endDate
       });
 
-      const response = await fetch(`http://localhost:8000/api/shifts?${params}`);
+      const response = await fetch(`http://localhost:8000/api/logistic-providers/${filters.providerId}/shifts?${params}`);
       const data = await response.json();
       
       if (data.success) {
