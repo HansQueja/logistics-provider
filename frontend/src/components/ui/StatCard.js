@@ -11,7 +11,7 @@ const StatCard = ({ title, value, icon }) => {
                 {icon && <div className="mr-4 text-3xl text-indigo-500">{icon}</div>}
                 <div>
                     <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">{title}</p>
-                    <p className="text-3xl font-bold text-gray-900">{value}</p>
+                    <p className="text-3xl font-bold text-blue-700">{value}</p>
                 </div>
             </div>
         </div>

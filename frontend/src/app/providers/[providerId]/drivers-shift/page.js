@@ -30,9 +30,15 @@ export default function DriversShiftPage() {
     const [rangeType, setRangeType] = useState('daily');
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
+    // Applied filter state
+    const [appliedFilters, setAppliedFilters] = useState({
+        rangeType: 'daily',
+        startDate: new Date(),
+        endDate: new Date(),
+    });
 
     // --- DATA FETCHING ---
-    const apiUrl = `http://127.0.0.1:8000/api/logistic-providers/${providerId}/shifts?range_type=${rangeType}&start_date=${formatDateForAPI(startDate)}&end_date=${formatDateForAPI(endDate)}`;
+    const apiUrl = `http://127.0.0.1:8000/api/logistic-providers/${providerId}/shifts?range_type=${appliedFilters.rangeType}&start_date=${formatDateForAPI(appliedFilters.startDate)}&end_date=${formatDateForAPI(appliedFilters.endDate)}`;
     const { data: shiftResponse, error: shiftError, isLoading: shiftIsLoading } = useSWR(providerId ? apiUrl : null, fetcher);
 
     const shiftData = shiftResponse?.data;
@@ -81,7 +87,7 @@ export default function DriversShiftPage() {
     // --- RENDER THE DASHBOARD ---
     return (
         <div className="space-y-8">
-            <h1 className="text-3xl font-extrabold text-gray-900">Driver Shift Dashboard</h1>
+            <h1 className="text-3xl font-extrabold text-white bg-blue-900 rounded-lg shadow p-4">Driver Shift Dashboard</h1>
 
             {/* Filter Component */}
             <DashboardFilters
@@ -91,6 +97,7 @@ export default function DriversShiftPage() {
                 onStartDateChange={setStartDate}
                 endDate={endDate}
                 onEndDateChange={setEndDate}
+                onApplyFilter={() => setAppliedFilters({ rangeType, startDate, endDate })}
             />
 
             {/* Stat Cards Section */}
@@ -103,7 +110,7 @@ export default function DriversShiftPage() {
 
             {/* Table Section */}
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">
+                <h2 className="text-xl font-bold text-white bg-gray-900 rounded shadow p-3 mb-4">
                     Detailed Report for {formatDateForAPI(startDate)} to {formatDateForAPI(endDate)}
                 </h2>
                 <ShiftsTable data={tableData} rangeType={rangeType} />
