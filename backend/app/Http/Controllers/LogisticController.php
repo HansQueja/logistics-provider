@@ -12,14 +12,16 @@ class LogisticController extends Controller
     // The method name can stay the same, but the logic is now more robust.
     public function assignedDrivers(LogisticProvider $provider) // <-- Change $id to LogisticProvider $provider
     {
-        // Use the injected $provider model and add the 'status' filter
-        $drivers_count = Driver::where('provider_id', $provider->id)
-                               ->where('status', 'LINKED')
-                               ->count();
+        $drivers_list = Driver::where('provider_id', $provider->id)
+                               ->where('status', 'LINKED')->get();
+
+        $logistic_provider = LogisticProvider::find($provider->id);
 
         return response()->json([
             // Using snake_case is more conventional for JSON keys
-            'assigned_drivers_count' => $drivers_count
+            'company_name' => $logistic_provider->company_name,
+            'assigned_drivers_count' => $drivers_list->count(),
+            'drivers_list' => $drivers_list
         ]);
     }
 }
