@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const Header = () => {
     return (
-        <header className="bg-gray-900 shadow-md">
+        <header className="bg-indigo-600 shadow-md">
             <div className="container mx-auto px-6 py-4">
                 <div className="flex justify-between items-center">
                     {/* Logo / Brand Name */}
@@ -54,8 +54,8 @@ const Header = () => {
                             {/* --- NEW LINK TO THE DELIVERY FORM --- */}
                             <li>
                                 <Link
-                                    href="/deliveries/new" // This is the correct URL for your form page
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300"
+                                    href="/deliveries/new"
+                                    className="bg-indigo-800 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300"
                                 >
                                     + New Delivery
                                 </Link>
