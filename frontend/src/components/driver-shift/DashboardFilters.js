@@ -12,6 +12,7 @@ const DashboardFilters = ({
     onStartDateChange,
     endDate,
     onEndDateChange,
+    onApplyFilter,
 }) => {
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-8">
@@ -52,6 +53,14 @@ const DashboardFilters = ({
                         className="block w-full pl-3 pr-10 py-2 text-base font-bold text-gray-900 border-gray-400 focus:outline-none focus:ring-indigo-700 focus:border-indigo-700 rounded-md"
                     />
                 </div>
+            </div>
+            <div className="mt-4 text-right">
+                <button
+                    className="px-6 py-2 bg-blue-900 text-white font-bold rounded shadow hover:bg-blue-800 transition"
+                    onClick={onApplyFilter}
+                >
+                    Apply Filter
+                </button>
             </div>
         </div>
     );
