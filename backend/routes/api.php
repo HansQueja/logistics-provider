@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VehicleUsageController;
 use App\Http\Controllers\LogisticController;
 use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\ShiftController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,3 +32,10 @@ Route::get('/logistic-providers/{provider}/drivers', [DeliveryController::class,
 
 // Route for "Daily Scan-ins & Scan-outs" trend
 Route::get('/logistic-providers/{provider}/activity-trend', [VehicleUsageController::class, 'activityTrend']);
+
+// Route for "Driver Login Duration/Shift" feature (consistent pattern)
+Route::get('/logistic-providers/{provider}/shifts', [ShiftController::class, 'getShiftDurations']);
+Route::options('/logistic-providers/{provider}/shifts', [ShiftController::class, 'getShiftDurations']);
+
+// Route for recording QR scans
+Route::post('/scans', [ShiftController::class, 'recordScan']);

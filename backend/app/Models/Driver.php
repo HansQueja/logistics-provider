@@ -19,4 +19,9 @@ class Driver extends Model
     {
         return $this->belongsTo(LogisticProvider::class, 'provider_id');
     }
+
+    public function qrScanLog()
+    {
+        return $this->hasMany(QrScanLog::class);
+    }
 }

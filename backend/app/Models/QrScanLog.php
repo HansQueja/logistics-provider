@@ -17,6 +17,12 @@ class QrScanLog extends Model
     protected $fillable = [
         'driver_id',
         'scan_type',
+        'scanned_at',
+    ];
+
+    protected $casts = [
+        'scan_type' => 'string',
+        'scanned_at' => 'datetime',
     ];
 
     /**
