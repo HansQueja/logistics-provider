@@ -30,7 +30,7 @@ const DashboardFilters = ({
                         id="vehicleType"
                         value={selectedType}
                         onChange={(e) => onTypeChange(e.target.value)}
-                        className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+                        className="block w-full pl-3 pr-10 py-2 text-base text-black border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
                     >
                         <option value="all">All Types</option>
                         {vehicleTypes.map(type => (<option key={type} value={type}>{type}</option>))}
@@ -45,7 +45,7 @@ const DashboardFilters = ({
                         selected={selectedDate}
                         onChange={(date) => onDateChange(date)}
                         dateFormat="yyyy-MM-dd"
-                        className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+                        className="block w-full pl-3 pr-10 py-2 text-base text-black border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
                     />
                 </div>
 

@@ -97,7 +97,7 @@ export default function VehicleUsagePage() {
 
             {/* Line Chart Section for Activity Trend */}
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">Activity Trend</h2>
+                <h2 className="text-xl text-gray-600 font-semibold mb-4">Activity Trend</h2>
                 {trendIsLoading && <p>Loading trend data...</p>}
                 {trendError && <p className="text-red-500">Could not load trend data.</p>}
                 {trendData && trendData.length > 0 ? (
@@ -126,7 +126,7 @@ export default function VehicleUsagePage() {
             {/* Bar and Pie Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-semibold mb-4">Daily Usage Hours</h2>
+                    <h2 className="text-xl text-gray-700 font-semibold mb-4">Daily Usage Hours</h2>
                     {filteredData.length > 0 ? (
                         <UsageBarChart data={{
                             labels: filteredData.map(v => v.plate_number),
@@ -139,7 +139,7 @@ export default function VehicleUsagePage() {
                     ) : <p className="text-white-500">No data for this filter selection.</p>}
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-semibold mb-4">Vehicle Types</h2>
+                    <h2 className="text-xl text-gray-700 font-semibold mb-4">Vehicle Types</h2>
                      {filteredData.length > 0 ? (
                         <VehicleTypePieChart data={{
                             labels: [...new Set(filteredData.map(v => v.vehicle_type))],
@@ -156,7 +156,7 @@ export default function VehicleUsagePage() {
 
             {/* Table Section */}
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">Detailed Report for {formatDateForAPI(selectedDate)}</h2>
+                <h2 className="text-xl text-gray-700 font-semibold mb-4">Detailed Report for {formatDateForAPI(selectedDate)}</h2>
                 {filteredData.length > 0 ? <UsageTable data={filteredData} /> : <p className="text-gray-500">No data for this filter selection.</p>}
             </div>
         </div>
