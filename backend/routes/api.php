@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VehicleUsageController;
 use App\Http\Controllers\LogisticController;
 use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\ShiftController;
 
 /*
 |--------------------------------------------------------------------------
