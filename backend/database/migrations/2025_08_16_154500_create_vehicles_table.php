@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('drivers', function (Blueprint $table) {
+    Schema::create('vehicles', function (Blueprint $table) {
         $table->id();
         $table->string('name');
-        $table->foreignId('provider_id')
-              ->constrained('logistic_providers')
-              ->onDelete('cascade');
+        $table->string('type'); // e.g., truck, van
+        $table->string('plate_number')->unique();
+        $table->foreignId('logistic_provider_id')->constrained('logistic_providers')->onDelete('cascade');
         // Add this line
-        $table->foreignId('assigned_vehicle_id')->nullable()->constrained('vehicles');
-        $table->enum('status', ['REGISTERED', 'LINKED', 'UNASSIGNED', 'REJECTED']);
+        $table->string('status')->default('ACTIVE'); // e.g., ACTIVE, MAINTENANCE
         $table->timestamps();
     });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('drivers');
+        Schema::dropIfExists('vehicles');
     }
 };

@@ -2,11 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class QrScanLog extends Model
 {
+    use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'driver_id',
         'scan_type',
@@ -19,9 +26,9 @@ class QrScanLog extends Model
     ];
 
     /**
-     * Get the driver that owns the QR scan log.
+     * Get the driver that owns the scan log.
      */
-    public function driver(): BelongsTo
+    public function driver()
     {
         return $this->belongsTo(Driver::class);
     }
